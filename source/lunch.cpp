@@ -5,7 +5,6 @@
 #include <vector>
 #include "curl/curl.h"
 #include "json/json.h"
-#include "secret_config.h"
 
 using namespace std;
 namespace
@@ -24,10 +23,6 @@ namespace
 
 static int get_curl_json(string url) {
     CURL* curl = curl_easy_init();
-
-    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER , 1);
-    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST , 1);
-
 
     // Set remote URL.
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
@@ -86,8 +81,8 @@ static int get_curl_json(string url) {
 
 static void show_usage(string name) {
     cerr << "Usage: " << name << " <option(s)>"
-        << "Options:\n"
-        << "\t-h,--help\t\tShow this help message\n"
+        "Options:\n"
+        "\t-h,--help\t\tShow this help message\n"
         << endl;
 }
 
@@ -96,8 +91,8 @@ int main(int argc, char* argv[]) {
         show_usage(argv[0]);
         return 1;
     }
-    const string ipUrl = (string("http://ipinfo.io?token=") + IPINFO_API_KEY);
-    const string placeUrl = (string("https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=Gatech&inputtype=textquery&fields=formatted_address,place_id,name,permanently_closed,types&key=") + GOOGLE_API_KEY);
+    const string ipUrl = string("http://localhost:5000/ipinfo");
+    const string placeUrl = string("http://localhost:5000/google");
     auto thing = get_curl_json(ipUrl);
     auto thing2 = get_curl_json(placeUrl);
 

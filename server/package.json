@@ -1,0 +1,21 @@
+{
+  "name": "lunch_server",
+  "version": "1.0.0",
+  "description": "server for lunch",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "tomin",
+  "license": "ISC",
+  "dependencies": {
+    "async": "^2.6.2",
+    "body-parser": "^1.18.3",
+    "express": "^4.16.4",
+    "googleapis": "^39.1.0",
+    "http": "0.0.0",
+    "request": "^2.88.0",
+    "socket.io": "^2.2.0"
+  }
+}
