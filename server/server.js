@@ -16,10 +16,39 @@ const googleKey = config.GOOGLE_API_KEY
 const ipinfoKey = config.IPINFO_API_KEY
 
 app.use(bodyParser.urlencoded({extended : true}));
+
+app.listen(port, () => {
+	console.log(`Listening on port ${port}`)
+})
+
 app.get("/google", function(req, response) {
-	request(`https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=Gatech&inputtype=textquery&fields=formatted_address,place_id,name,permanently_closed,types&key=${googleKey}`, { json: true },(err, resp, body) => {
+	const type = req.query.type
+	let location
+	const zip = req.query.zip ? req.query.zip : ''
+	request(`https://maps.googleapis.com/maps/api/geocode/json?address=${zip}&key=${googleKey}`, { json: true },(err, resp, body) => {
 		if (err) { return console.log(err) }
-		response.send(body)
+		if (req.query.coord) {
+			location = req.query.coord
+		} else if (req.query.zip) {
+			const coords = body.results[0].geometry.location
+			location = `${coords.lat},${coords.lng}`
+		} else {
+			location = req.query.ipcoord
+		}
+		let dist = !req.query.dist ? '4000' : req.query.dist
+		let minprice = !req.query.minprice ? '' : `&minprice=${req.query.minprice}`
+		let maxprice = !req.query.maxprice ? '' : `&maxprice=${req.query.maxprice}`
+		request(`https://maps.googleapis.com/maps/api/place/nearbysearch/json?type=restaurant&key=${googleKey}&radius=${dist}&location=${location}&opennow${maxprice}${minprice}`, { json: true }, (err, resp, body) => {
+			let places = {}
+			places.results = {}
+			for (let place in body.results) {
+				places.results[body.results[place].name] = {
+					"name": body.results[place].name,
+					"address": body.results[place].vicinity
+				}
+			}
+			response.send(places)
+		})
 	})
 })
 
@@ -30,6 +59,3 @@ app.get("/ipinfo", function(req, response) {
 	})
 })
 
-app.listen(port, () => {
-	console.log(`Listening on port ${port}`)
-})
